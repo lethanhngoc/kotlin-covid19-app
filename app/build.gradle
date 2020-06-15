@@ -48,4 +48,13 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
 
+    //koin
+    implementation "org.koin:koin-android:$rootProject.koinVersion"
+    implementation "org.koin:koin-android-scope:$rootProject.koinVersion"
+    implementation "org.koin:koin-android-viewmodel:$rootProject.koinVersion"
+
+    //calligraphy
+    implementation "uk.co.chrisjenx:calligraphy:$rootProject.calligraphyVersion"
+
+
 }
