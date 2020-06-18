@@ -1,20 +1,55 @@
 package com.example.kotlin_covid19_app
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
-import com.example.kotlin_covid19_app.common.PREFERENCE_NAME
+import com.example.kotlin_covid19_app.di.*
+import com.example.kotlin_covid19_app.util.Constant
+import com.example.kotlin_covid19_app.ui.dashboard.DashboardActivity
 import com.example.kotlin_covid19_app.ui.dashboard.DashboardFragment
 import com.example.kotlin_covid19_app.ui.home.HomeFragment
 import com.example.kotlin_covid19_app.ui.notifications.NotificationsFragment
+import com.example.kotlin_covid19_app.util.PREFERENCE_NAME
+import com.jakewharton.threetenabp.AndroidThreeTen
+import com.orhanobut.hawk.Hawk
+import org.koin.android.ext.android.inject
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.startKoin
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig
 
 class MainActivity : AppCompatActivity() {
 
+    private val calConfig: CalligraphyConfig by inject()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        AndroidThreeTen.init(this);
+
+        startKoin {
+            androidContext(this@MainActivity)
+            modules(networkModule)
+            modules(persistenceModule)
+            modules(repositoryModule)
+            modules(appModule)
+            modules(viewModelModule)
+        }
+
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
+        CalligraphyConfig.initDefault(calConfig)
+        Hawk.init(applicationContext).setLogInterceptor { message ->
+            if (BuildConfig.DEBUG) {
+                Log.d("Hawk", message)
+            }
+        }.build()
+
         setContentView(R.layout.activity_main)
+
         init()
     }
 
@@ -26,17 +61,19 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.hide()
 
         val tab : Int = preference.getInt("KEY-TAB",0)
-        when(tab){
-            0 ->{
-                openFragment(HomeFragment())
-            }
-            1 ->{
-                openFragment(DashboardFragment())
-            }
-            2 ->{
-                openFragment(NotificationsFragment())
-            }
-        }
+        val intent = Intent(this, DashboardActivity::class.java)
+        startActivity(intent)
+//        when(tab){
+//            0 ->{
+//                startActivity(Intent(applicationContext,DashboardActivity::class.java))
+//            }
+//            1 ->{
+//                startActivity(Intent(applicationContext,DashboardActivity::class.java))
+//            }
+//            2 ->{
+//                startActivity(Intent(applicationContext,DashboardActivity::class.java))
+//            }
+//        }
 
     }
 
@@ -48,7 +85,7 @@ class MainActivity : AppCompatActivity() {
                 val prefEditor = preference.edit()
                 prefEditor.putInt("KEY-TAB", 0)
                 prefEditor.apply()
-                openFragment(HomeFragment())
+                startActivity(Intent(applicationContext,DashboardActivity::class.java))
                 return@OnNavigationItemSelectedListener true;
             }
             R.id.navigation_dashboard ->{
@@ -57,7 +94,7 @@ class MainActivity : AppCompatActivity() {
                 val prefEditor = preference.edit()
                 prefEditor.putInt("KEY-TAB", 1)
                 prefEditor.apply()
-                openFragment(DashboardFragment())
+                startActivity(Intent(applicationContext,DashboardActivity::class.java))
                 return@OnNavigationItemSelectedListener true;
             }
             R.id.navigation_notifications ->{
@@ -66,7 +103,7 @@ class MainActivity : AppCompatActivity() {
                 val prefEditor = preference.edit()
                 prefEditor.putInt("KEY-TAB", 2)
                 prefEditor.apply()
-                openFragment(NotificationsFragment())
+                startActivity(Intent(applicationContext,DashboardActivity::class.java))
                 return@OnNavigationItemSelectedListener true;
             }
         }
